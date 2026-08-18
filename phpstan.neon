@@ -4,4 +4,3 @@ includes:
 
 parameters:
   level: 8
-  reportUnmatchedIgnoredErrors: false

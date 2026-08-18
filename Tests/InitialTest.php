@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace AUS\SentryBridge\Tests;
 
-use Networkteam\SentryClient\Client;
 use AUS\SentryBridge\Tests\Helper\MockApi;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Pluswerk\SentryTestExtension\UserFunction\ErrorTrigger;
 use Sentry\Breadcrumb;
+use TYPO3\CMS\Core\Information\Typo3Version;
 
 class InitialTest extends TestCase
 {
@@ -46,8 +47,8 @@ class InitialTest extends TestCase
 
         // every exception is send 2 times, once with handled = false and once with handled = true
         foreach ($content as $event) {
-            $event->assertSingleException('TypeError', Client::class . '::captureException(): Argument #1 ($exception) must be of type Throwable, string given');
-            $event->assertExceptionFileAndLine('Classes/Client.php', 16);
+            $event->assertSingleException('TypeError', ErrorTrigger::class . '::trigger(): Argument #1 ($errorTrigger) must be of type ' . ErrorTrigger::class . ', string given');
+            $event->assertExceptionFileAndLine('test_extension/Classes/UserFunction/ErrorTrigger.php', 16);
 
             self::assertEquals(['ipAddress' => '127.0.0.0'], $event->user, 'Expected no user data in the event');
 
@@ -55,6 +56,12 @@ class InitialTest extends TestCase
 
             $categoryFUA = 'TYPO3.CMS.Frontend.Authentication.FrontendUserAuthentication';
             $categoryPTPM = 'TYPO3.CMS.Core.PageTitle.PageTitleProviderManager';
+            $breadcrumbs = [];
+            if ((new Typo3Version())->getMajorVersion() >= 14) {
+                $breadcrumbs[] = new Breadcrumb('debug', 'default', $categoryPTPM, 'Page title provider {provider} skipped on page {title}', ['title' => 0, 'provider' => 0, 'providerUsed' => 2]);
+            }
+
+            $breadcrumbs[] = new Breadcrumb('debug', 'default', $categoryPTPM, 'Page title provider {provider} used on page {title}', ['title' => 0, 'provider' => 0]);
             $event->assertBreadCrumbs(
                 new Breadcrumb('debug', 'default', $categoryFUA, '## Beginning of auth logging.'),
                 new Breadcrumb('debug', 'default', $categoryFUA, 'Login type: {type}', ['type' => 0]),
@@ -63,7 +70,7 @@ class InitialTest extends TestCase
                 new Breadcrumb('debug', 'default', $categoryFUA, 'No usergroups found'),
                 new Breadcrumb('debug', 'default', $categoryFUA, 'Valid frontend usergroups: {groups}', ['groups' => 0]),
                 new Breadcrumb('debug', 'default', $categoryPTPM, 'Page title providers ordered', ['orderedTitleProviders' => 0]),
-                new Breadcrumb('debug', 'default', $categoryPTPM, 'Page title provider {provider} used on page {title}', ['title' => 0, 'provider' => 0]),
+                ...$breadcrumbs,
             );
         }
     }
@@ -87,7 +94,14 @@ class InitialTest extends TestCase
 
             self::assertEquals(['ipAddress' => '127.0.0.0'], $event->user, 'Expected no user data in the event');
 
-            $event->assertMetaData(requestType: 'frontend');
+            $requestType = 'frontend';
+            if ((new Typo3Version())->getMajorVersion() >= 14) {
+                // after 14 the middleware stack does not have the TYPO3_REQUEST object and can not find out what type the request is.
+                // if https://github.com/networkteam/sentry_client/pull/126 is merged we need to use: $requestType = 'request';
+                $requestType = null;
+            }
+
+            $event->assertMetaData(requestType: $requestType);
 
             $categoryFUA = 'TYPO3.CMS.Frontend.Authentication.FrontendUserAuthentication';
             $event->assertBreadCrumbs(

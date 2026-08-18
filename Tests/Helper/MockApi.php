@@ -18,14 +18,14 @@ use function dirname;
 use function file_put_contents;
 use function function_exists;
 use function is_dir;
-use function json_decode;
-use function json_encode;
 use function serialize;
 
 use const PHP_EOL;
 
 final readonly class MockApi
 {
+    private const SERIALIZATION_LINE_SEPARATOR = PHP_EOL . '__NEXT__' . PHP_EOL;
+
     private string $randomSeed;
 
     private string $projectPath;
@@ -79,7 +79,7 @@ final readonly class MockApi
         unlink($fileName);
 
         $result = [];
-        $lines = explode(PHP_EOL, trim($content));
+        $lines = explode(self::SERIALIZATION_LINE_SEPARATOR, trim($content));
         foreach ($lines as $line) {
             if ($line === '') {
                 continue;
@@ -132,7 +132,7 @@ final readonly class MockApi
                 mkdir(dirname($fileName), recursive: true);
             }
 
-            file_put_contents($fileName, serialize($sentryEvent) . PHP_EOL, FILE_APPEND | LOCK_EX);
+            file_put_contents($fileName, serialize($sentryEvent) . self::SERIALIZATION_LINE_SEPARATOR, FILE_APPEND | LOCK_EX);
 //            file_put_contents($fileName . '.txt', new Exception()->getTraceAsString() . PHP_EOL, FILE_APPEND | LOCK_EX);
         } catch (Throwable $throwable) {
             if (function_exists('dump')) {

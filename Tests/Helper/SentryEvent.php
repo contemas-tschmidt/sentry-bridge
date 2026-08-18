@@ -85,8 +85,8 @@ final readonly class SentryEvent
     public function assertSingleException(string $throwableClass, string $messageContains): void
     {
         $exception = $this->getException();
-        Assert::assertEquals($throwableClass, $exception->getType(), 'Exception type does not match expected value');
         Assert::assertStringContainsString($messageContains, $exception->getValue(), 'Exception message does not contain expected value');
+        Assert::assertEquals($throwableClass, $exception->getType(), 'Exception type does not match expected value');
     }
 
     public function getLastStackTraceFrame(): Frame
@@ -95,7 +95,7 @@ final readonly class SentryEvent
         $stacktrace = $exception->getStacktrace();
         Assert::assertInstanceOf(Stacktrace::class, $stacktrace);
         $frames = $stacktrace->getFrames();
-        return $frames[array_key_last($frames)];
+        return $frames[(int)array_key_last($frames)];
     }
 
     /**
@@ -109,7 +109,7 @@ final readonly class SentryEvent
         Assert::assertLessThanOrEqual($lineNumber + $plusMinus, $lastFrame->getLine(), 'Exception line does not match expected value');
     }
 
-    public function assertMetaData(string $requestType): void
+    public function assertMetaData(?string $requestType): void
     {
         Assert::assertNotEmpty($this->tags['typo3_version'], 'Expected tags "typo3_version" to not be empty');
         Assert::assertEquals($requestType, $this->tags['request_type'], 'Expected tags "typo3_mode" to be "frontend"');

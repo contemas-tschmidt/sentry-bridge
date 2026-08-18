@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use AUS\SentryBridge\Logger\BreadcrumbLogger;
 use Psr\Log\LogLevel;
 use TYPO3\CMS\Frontend\ContentObject\Exception\ProductionExceptionHandler;

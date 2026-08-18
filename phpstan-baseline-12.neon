@@ -1,0 +1,21 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to static method configure\\(\\) on an unknown class a9f\\\\Fractor\\\\Configuration\\\\FractorConfiguration\\.$#"
+			count: 1
+			path: fractor.php
+
+		-
+			message: "#^Call to static method options\\(\\) on an unknown class PLUS\\\\GrumPHPConfig\\\\FractorSettings\\.$#"
+			count: 1
+			path: fractor.php
+
+		-
+			message: "#^Call to static method rules\\(\\) on an unknown class PLUS\\\\GrumPHPConfig\\\\FractorSettings\\.$#"
+			count: 1
+			path: fractor.php
+
+		-
+			message: "#^Call to static method sets\\(\\) on an unknown class PLUS\\\\GrumPHPConfig\\\\FractorSettings\\.$#"
+			count: 1
+			path: fractor.php

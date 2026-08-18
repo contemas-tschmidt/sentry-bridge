@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Networkteam\SentryClient\ProductionExceptionHandler;
 use Networkteam\SentryClient\DebugExceptionHandler;
 use TYPO3\CMS\Core\Core\Environment;

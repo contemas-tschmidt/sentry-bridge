@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use AUS\SentryAsync\Queue\FileQueue;
 use AUS\SentryBridge\EventListener\ConsoleErrorEventListener;
 use Sentry\ClientInterface;

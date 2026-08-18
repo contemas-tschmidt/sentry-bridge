@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Pluswerk\SentryTestExtension\Middleware\LastMiddlewareTestExceptionMiddleware;
 
 return [
