@@ -54,6 +54,11 @@
       "pluswerk/grumphp-config": true,
       "typo3/class-alias-loader": true,
       "typo3/cms-composer-installers": true
+    },
+    "policy": {
+      "advisories": {
+        "block": false
+      }
     }
   },
   "extra": {
